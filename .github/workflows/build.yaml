@@ -1,0 +1,38 @@
+name: Build and Publish Artifact
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Get Previous Version
+        id: get_version
+        run: echo "::set-output name=version::$(git describe --tags --abbrev=0 || echo 'v0.0.0')"
+
+      - name: Increment Version
+        id: increment_version
+        run: echo "::set-output name=version::$(echo "${{ steps.get_version.outputs.version }}" | awk -F. -v OFS=. '{++$NF;print $0}')"
+
+      - name: Publish Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: sample-app-${{ steps.increment_version.outputs.version }}
+          path: .
+
+      # - name: Trigger Ansible Tower Job
+      #   run: |
+      #     curl -X POST -H "Content-Type: application/json" \
+      #     -u USERNAME:PASSWORD \
+      #     -d '{"extra_vars": {"artifact": "my-artifact"}}' \
+      #     https://ansible-tower/api/v2/job_templates/123/launch/
