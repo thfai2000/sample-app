@@ -1,0 +1,19 @@
+[Unit]
+Description=ptrm-cpc-partner-control-service
+After=network-online.target
+
+[Service]
+Type=simple
+User={{ getenv "APP_SERVICE_ACCOUNT" }}
+Group={{ getenv "APP_SERVICE_ACCOUNT_GROUP" }}
+WorkingDirectory={{ getenv "COMPONENT_BINARY_DIR" }}
+Environment="KRB5CCNAME={{ getenv "KERBEROS_TKT_PATH"}}"
+ExecStart={{ getenv "SERVICE_START_CPC_PARTNER_CONTROL_CMD" }}
+ExecReload=/bin/sh -c "/bin/kill -s HUP $MAINPID"
+ExecStop=/bin/sh -c "/bin/kill -s TERM $MAINPID"
+SuccessExitStatus=143
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

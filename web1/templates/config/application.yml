@@ -1,0 +1,243 @@
+{{- $site := getenv "WHICH_SITE" -}}
+{{- $hostLabel := getenv "HOST_LABEL" -}}
+{{- with (index (datasource "values") $site) -}}
+#######################################################
+# Common properties
+#######################################################
+project:
+  name: 'cpc-partner-control'
+  version: '{{ getenv "COMPONENT_VERSION" }}'
+  snapshotVersion: '{{ getenv "SNAPSHOT_VERSION" }}'
+  sysVersion: "L1.0R1"
+  buildTime: '@buildTime@'
+  description: 'CPC - partner control'
+
+server:
+  port: 8081
+  servlet:
+    context-path: /cpc/v1
+  max-http-header-size: 1MB
+  ssl:
+    enabled: {{ .server_ssl.app.enabled}}
+    key-store: {{ getenv "SSL_CERT_DIR" }}/{{ .server_ssl.app.key_store}}
+    key-store-type: {{ .server_ssl.app.key_store_type}}
+    key-store-password: {{ .server_ssl.app.key_store_password}}
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    packagesToScan: com.hkjc.cmgc
+    
+spring:
+  application:
+    name: cpc-service
+  main:
+    allow-bean-definition-overriding: true
+  devtools:
+    restart:
+      additional-paths: src/main/java
+  data:
+    mongodb:
+      uri: "mongodb://{{ .partner_control.spring.data.mongodb.username}}:${spring.data.mongodb.mdbpwd}@{{ .partner_control.spring.data.mongodb.host_port}}/{{ .partner_control.spring.data.mongodb.database}}{{ .partner_control.spring.data.mongodb.connect_param}}"
+      mdbpwd: {{ print "ENC("}}{{ getenv "ENCRYPTED_MONGODB_PASSWORD" }}{{ print ")" }}
+      transactionEnabled: false
+      writeConcern:
+        enable: {{ .partner_control.spring.data.mongodb.writeConcern.enable }}
+        minWriteSize: {{ .partner_control.spring.data.mongodb.writeConcern.minWriteSize }}
+        timeout: {{ .partner_control.spring.data.mongodb.writeConcern.timeout }}
+jasypt:
+  encryptor:
+    algorithm: PBEWITHHMACSHA512ANDAES_256
+
+management:
+  health:
+    probes:
+      enabled: true
+
+permission:
+  csv:
+    path: 'permission/wmr_auth.permissions.csv'
+
+eureka:
+  client:
+    register-with-eureka: false
+    fetchRegistry: false
+    server:
+      waitTimeInMsWhenSyncEmpty: 0
+
+longPolling:
+  nThreads: 50
+  threadPool:
+    queueCapacity: 50000 # configure it small in non-product env to investigate problem early
+
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  # Snowflake ID
+#  global-config:
+#    worker-id: 1
+#    datacenter-id: 1
+
+solace:
+  jms:
+    host: {{.partner_control.solace.jms.host }}
+    msgVpn: {{.partner_control.solace.jms.msgVpn}}
+    isPasswordAuth: {{.partner_control.solace.jms.isPasswordAuth}}
+    clientUsername: {{.partner_control.solace.jms.clientUsername}}
+    clientPassword: {{.partner_control.solace.jms.clientPassword}}
+    sslValidateCertificate: {{.partner_control.solace.jms.sslValidateCertificate}}
+    sslTrustStore: {{getenv "SSL_TRUST_STORE_DIR"}}
+    sslTrustStoreFormat: {{.partner_control.solace.jms.sslTrustStoreFormat}}
+    sslTrustStorePassword: {{getenv "SSL_TRUST_STORE_PASSWORD"}}
+    #cfss
+    cfss_host: {{.partner_control.solace.jms.cfss_host}}
+    cfss_msgVpn: {{.partner_control.solace.jms.cfss_msgVpn}}
+    cfssEnableSSLValidateCertificate: {{.partner_control.solace.jms.cfssEnableSSLValidateCertificate}}
+    cfss_clientUsername: {{.partner_control.solace.jms.clientUsername}}
+    cfss_clientPassword: {{.partner_control.solace.jms.clientPassword}}
+    # Example of using a Solace JMS API property:
+  # For the property name refer to the constant field values for com.solacesystems.jms.SupportedProperty at
+  # https://docs.solace.com/API-Developer-Online-Ref-Documentation/jms/constant-values.html
+  #    apiProperties:
+  #      Solace_JMS_DynamicDurables: true
+  out:
+    toteInformationSubscription:
+      queue: wppi_info/ib/evt/rwem/wp_ctrl
+      topic: hk/g/prdt/wager/evt/01/upd/rwem/ptnr_mgt/hub_subs/init
+    grantPoolTotePerRace:
+      queue: wppi_info/ib/evt/rwem/wp_ctrl
+      topic: hk/g/prdt/wager/evt/01/upd/rwem/ptnr_mgt/grnt_pool/init
+    betCancellation:
+      queue: ptrm_cpm/evt/rwem/wp_ctrl
+      topic: hk/g/prdt/wager/evt/01/upd/rwem/ptnr_mgt/bet_cncl/init
+    meeting:
+      queue: wppi_info/ib/evt/rwem/wp_ctrl
+      topic: hk/g/prdt/wager/evt/01/upd/rwem/ptnr_mgt/mtg/init
+    broadCastMessage:
+      enable: true
+      queue: ptrm_cpc/evt/int/notif_msg
+      topic: hk/d/inct/dissem/evt/01/upd/ptnr_mgt_ctrl/notif_msg/init
+  in:
+    cfssDataChannel:
+      queue: ptrm_cpc/evt/cmg_ctrl/track_info
+      topic: hk/g/idx/prof/evt/01/upd/cmgc/track_info
+    wppActivenessChannel:
+      queue: ptrm_cpc/evt/wpp/hub/atvn
+      topic: hk/d/inct/dissem/evt/01/upd/wpp/hub/atvn/*/init
+  rpc:
+    in:
+      rpt:
+        queue: ptrm_cpc/req/info/proc
+        topic: hk/d/inct/dissem/req/01/put/ptnr_mgt_ctrl/info/init
+    out:
+      timeout: 30000
+      request:
+        queue: cmgc/req/cnsl_opr_svc/proc
+        topic: hk/d/prdt/wager/req/01/upd/cmg_ctrl/cnsl_opr_svc/init
+      rpt:
+        queue: ptrm_rpt/req/rpt_svc/proc
+        topic: hk/d/inct/dissem/req/01/put/ptnr_mgt_rpt/rpt_svc/init
+
+ledger:
+#  host: 10.212.82.151
+  host: {{ .partner_control.ledger.host}}
+  port: {{ .partner_control.ledger.port}}
+  isEnableSSL: {{ .partner_control.ledger.isEnableSSL}}
+  certFile: {{getenv "SSL_CERT_DIR" }}/{{ .partner_control.ledger.certFile}}
+  partner:
+    manager:
+      id: {{ .partner_control.ledger.partner.manager.id}}
+  uk:
+    user:
+      id: {{ .partner_control.ledger.uk.user.id}}
+#  racing:
+#    manager:
+#      id: hkjc
+  processor:
+    enable: {{ .partner_control.ledger.processor.enable}}
+  batchSize: {{ .partner_control.ledger.batchSize}}
+
+recall:
+  message-groups:
+    "[LINK UP / LINK DOWN]":
+      - EVT_ITSP_WCR_LINK_STATUS
+      - EVT_ITSP_EXT_LINK_STATUS
+      - EVT_ITSP_EXT_TXLV_LINK_STATUS
+      - EVT_ITSP_OUTBOUND_EXT_LINK_STATUS
+      - EVT_ITSP_EVTSYNC_LINK_STATUS
+    "[EXTERNAL TOTE CONFIGURATION / RE-CONFIGURATION COMPLETED]":
+      - EVT_ITSP_EXT_TOTE_CONFIG
+      - EVT_WPP_TOTE_STATUS_LIST_BY_MEETING_MODIFIED
+      - EVT_WPP_TOTE_STATUS_MODIFY
+    "[PSEUDO COLLATION COMPLETED]":
+      - EVT_ITSP_EXT_PSEUDO_COLLATION_COMPLETED
+    "[TXLV PSEUDO COLLATION VERIFY OK]":
+      - EVT_ITSP_TXLV_PSEUDO_COLLATION_VERIFY_OK
+    "[WINNER PASS COMPLETED]":
+      - EVT_ITSP_WCR_LOCAL_WINNER_PASS_COMPLETED
+      - EVT_ITSP_EXT_WINNER_PASS_COMPLETED
+    "[TXLV WINNER PASS VERIFY OK]":
+      - EVT_ITSP_TXLV_WINNER_PASS_VERIFY_OK
+    "[RACE COLLATION TIMEOUT / OTHER TIMEOUT ALERT]":
+      - EVT_ITSP_EXT_TIMEOUT_MSG
+    "[PSEUDO COLLATION REPLY / WINNER PASS NOT RECEIVED]":
+      - EVT_ITSP_TXLV_PSEUDO_COLLATION_NOT_RECEIVED
+      - EVT_ITSP_TXLV_WINNER_PASS_NOT_RECEIVED
+    "[LATE COLLATION FINAL]":
+      - EVT_ITSP_WCR_LATE_COLLATION_FINAL
+      - EVT_ITSP_EXT_LATE_COLLATION_FINAL
+      - EVT_ITSP_OUTBOUND_LATE_COLLATION_FINAL
+      - EVT_ITSP_HOST_LATE_COLLATION_FINAL
+    "[TOTE EXCEPTION]":
+      - EVT_ITSP_EXT_EXCEPTION
+      - EVT_ITSP_EXT_TOTE_EXCEPTION
+    "[MSG NAKED]":
+      - EVT_ITSP_EXT_MSG_NAKED
+    "[HIGH BOUNCE LIMIT]":
+      - EVT_ITSP_HIGH_BOUNCE_WARNING
+      - EVT_ITSP_HIGH_BOUNCE_FINAL_STOP_SELL
+      - EVT_ITSP_HIGH_BOUNCE_ZERO_OUT
+    "[HOST EXCEPTION]":
+      - EVT_ITSP_OUTBOUND_EXT_EXCEPTION
+      - EVT_ITSP_OUTBOUND_EXT_HOST_EXCEPTION
+    "[FINAL STOP SELL]":
+      - EVT_ITSP_FINAL_STOP_SELL
+      - EVT_WPP_FINAL_STOP_SELL
+    "[POOL COLLATION FINAL / COLLATION FINAL]":
+      - EVT_ITSP_EXT_POOL_COLLATION_FINAL
+      - EVT_ITSP_EXT_LATE_POOL_COLLATION_FINAL
+      - EVT_ITSP_EXT_COLLATION_FINAL
+      - EVT_ITSP_EXT_LATE_COLLATION_FINAL
+
+logging:
+  path: {{ getenv "COMPONENT_LOG_DIR" }}
+  file:
+    # path: '/var/log/ptrm/cpc/logs'
+    path: {{ getenv "COMPONENT_LOG_DIR" }}
+
+mqtt:
+  url: {{.partner_control.mqtt.url}}
+  userName: {{.partner_control.mqtt.userName}}
+  pwd: {{.partner_control.mqtt.pwd}}
+  topic: {{ .partner_control.mqtt.topic }}
+  cpmTopic: {{ .partner_control.mqtt.cpmTopic }}
+
+wso2:
+  url:
+    baseUrl: {{ .partner_control.wso2.url.baseUrl }}
+    registerUrl: /client-registration/v0.17/register
+    tokenUrl: /oauth2/token
+    searchApisUrl: /api/am/publisher/v2/apis
+    subscriptionsUrl: /api/am/publisher/v2/subscriptions
+    blockSubscriptionUrl: /api/am/publisher/v2/subscriptions/block-subscription
+    unblockSubscriptionUrl: /api/am/publisher/v2/subscriptions/unblock-subscription
+  register:
+    callbackUrl:
+    clientName: rest_api_subscription_user
+    grantType: client_credentials password refresh_token
+    saasApp: true
+  token:
+    grant_type: password
+    scope: apim:api_view apim:api_create apim:api_publish apim:subscription_view apim:subscription_block
+
+{{- end -}}
