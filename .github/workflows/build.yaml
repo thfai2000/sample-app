@@ -27,8 +27,26 @@ jobs:
       - name: Publish Artifact
         uses: actions/upload-artifact@v2
         with:
-          name: sample-app-${{ steps.increment_version.outputs.version }}
-          path: .
+          name: deploy-${{ steps.increment_version.outputs.version }}
+          path: deploy
+
+      - name: Publish Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: web1-${{ steps.increment_version.outputs.version }}
+          path: web1
+      
+      - name: Publish Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: web2-${{ steps.increment_version.outputs.version }}
+          path: web2
+      
+      - name: Publish Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: web3-${{ steps.increment_version.outputs.version }}
+          path: web3
 
       # - name: Trigger Ansible Tower Job
       #   run: |
