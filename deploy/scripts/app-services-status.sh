@@ -17,3 +17,4 @@ else
     echo "App binary folder ($APP_BINARY_DIR) does not exist"
     exit 1
 fi
+
