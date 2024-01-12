@@ -15,12 +15,15 @@ env:
   SNAPSHOT_NAME_PREFIX: Winter23_S15B1
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
 
+  build-deploy:
+    runs-on: ubuntu-latest
+    outputs:
+      new_version: ${{ contains(steps.folder_changes.outputs.changed, 'deploy/') }}
+      artifact-url: ${{ steps.publish_artifact_deploy.outputs.artifact-url }}
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       # - name: Get Previous Version
       #   id: get_version
@@ -33,8 +36,6 @@ jobs:
       - name: Check Folder Changes
         id: folder_changes
         run: echo "::set-output name=changed::$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }})"
-
-
       - name: Publish Artifact - Deploy
         uses: actions/upload-artifact@v2
         if: ${{ contains(steps.folder_changes.outputs.changed, 'deploy/') }}
@@ -42,6 +43,19 @@ jobs:
           name: deploy-$VERSION_MAJOR.$VERSION_MINOR.${{ github.run_id }}
           path: deploy
           retention-days: 300
+
+  build-web1:
+    runs-on: ubuntu-latest
+    outputs:
+      new_version: ${{ contains(steps.folder_changes.outputs.changed, 'web1/') }}
+      artifact-url: ${{ steps.publish_artifact_web1.outputs.artifact-url }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Check Folder Changes
+        id: folder_changes
+        run: echo "::set-output name=changed::$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }})"
 
       - name: Publish Artifact - Web1
         id: publish_artifact_web1
@@ -51,7 +65,20 @@ jobs:
           name: web1-$VERSION_MAJOR.$VERSION_MINOR.${{ github.run_id }}
           path: web1
           retention-days: 300
-      
+
+  build-web2:
+    runs-on: ubuntu-latest
+    outputs:
+      new_version: ${{ contains(steps.folder_changes.outputs.changed, 'web2/') }}
+      artifact-url: ${{ steps.publish_artifact_web2.outputs.artifact-url }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        
+      - name: Check Folder Changes
+        id: folder_changes
+        run: echo "::set-output name=changed::$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }})"
+
       - name: Publish Artifact - Web2
         id: publish_artifact_web2
         uses: actions/upload-artifact@v2
@@ -60,6 +87,20 @@ jobs:
           name: web2-$VERSION_MAJOR.$VERSION_MINOR.${{ github.run_id }}
           path: web2
           retention-days: 300
+
+  build-web3:
+    runs-on: ubuntu-latest
+    outputs:
+      new_version: ${{ contains(steps.folder_changes.outputs.changed, 'web3/') }}
+      artifact-url: ${{ steps.publish_artifact_web3.outputs.artifact-url }}
+      
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        
+      - name: Check Folder Changes
+        id: folder_changes
+        run: echo "::set-output name=changed::$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }})"
 
       - name: Publish Artifact - Web3
         id: publish_artifact_web3
@@ -70,10 +111,15 @@ jobs:
           path: web3
           retention-days: 300
 
-      - name: Checkout Versions Snapshot
+  create-snapshot:
+    runs-on: ubuntu-latest
+    # if: ${{ always() }}
+    needs: [build-deploy, build-web1, build-web2, build-web3]
+    steps:
+      - name: Checkout Repository
         uses: actions/checkout@v4
         with:
-          name: thfai2000/version_snapshots
+          repository: thfai2000/version_snapshots
           path: versions
 
       - name: Create Versions Snapshot
@@ -83,10 +129,19 @@ jobs:
           cd versions
           git config user.name github-actions
           git config user.email github-actions@github.com
-          ./utils/update_latest_snapshot.sh $VERSION_SNAPSHOT_FILENAME deploy deploy-$VERSION_MAJOR.$VERSION_MINOR.${{ github.run_id }} ${{ steps.publish_artifact_deploy.outputs.artifact-url }}
-          ./utils/update_latest_snapshot.sh $VERSION_SNAPSHOT_FILENAME web1 web1-$VERSION_MAJOR.$VERSION_MINOR.${{ github.run_id }} ${{ steps.publish_artifact_web1.outputs.artifact-url }}
-          ./utils/update_latest_snapshot.sh $VERSION_SNAPSHOT_FILENAME web2 web2-$VERSION_MAJOR.$VERSION_MINOR.${{ github.run_id }} ${{ steps.publish_artifact_web2.outputs.artifact-url }}
-          ./utils/update_latest_snapshot.sh $VERSION_SNAPSHOT_FILENAME web3 web3-$VERSION_MAJOR.$VERSION_MINOR.${{ github.run_id }} ${{ steps.publish_artifact_web3.outputs.artifact-url }}
+
+          if [[ ${{ needs.build-deploy.outputs.new_version }} ]]; then
+            ./utils/update_latest_snapshot.sh $VERSION_SNAPSHOT_FILENAME deploy deploy-$VERSION_MAJOR.$VERSION_MINOR.${{ github.run_id }} ${{ steps.publish_artifact_deploy.outputs.artifact-url }}
+          fi
+          if [[ ${{ needs.build-web1.outputs.new_version }} ]]; then
+            ./utils/update_latest_snapshot.sh $VERSION_SNAPSHOT_FILENAME web1 web1-$VERSION_MAJOR.$VERSION_MINOR.${{ github.run_id }} ${{ steps.publish_artifact_web1.outputs.artifact-url }}
+          fi
+          if [[ ${{ needs.build-web2.outputs.new_version }} ]]; then
+            ./utils/update_latest_snapshot.sh $VERSION_SNAPSHOT_FILENAME web2 web2-$VERSION_MAJOR.$VERSION_MINOR.${{ github.run_id }} ${{ steps.publish_artifact_web2.outputs.artifact-url }}
+          fi
+          if [[ ${{ needs.build-web3.outputs.new_version }} ]]; then
+            ./utils/update_latest_snapshot.sh $VERSION_SNAPSHOT_FILENAME web3 web3-$VERSION_MAJOR.$VERSION_MINOR.${{ github.run_id }} ${{ steps.publish_artifact_web3.outputs.artifact-url }}
+          fi
 
           ./utils/create_snapshot.sh $VERSION_SNAPSHOT_FILENAME ${SNAPSHOT_NAME_PREFIX}
           git add .
