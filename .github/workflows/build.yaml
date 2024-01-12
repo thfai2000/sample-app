@@ -8,6 +8,12 @@ on:
     branches:
       - main
 
+env:
+  VERSION_MAJOR: 1
+  VERSION_MINOR: 0
+  VERSION_SNAPSHOT_FILENAME: sample-app
+  SNAPSHOT_NAME_PREFIX: Winter23_S15B1
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -16,38 +22,71 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v2
 
-      - name: Get Previous Version
-        id: get_version
-        run: echo "::set-output name=version::$(git describe --tags --abbrev=0 || echo 'v0.0.0')"
+      # - name: Get Previous Version
+      #   id: get_version
+      #   run: echo "::set-output name=version::$(git describe --tags --abbrev=0 || echo 'v0.0.0')"
 
-      - name: Increment Version
-        id: increment_version
-        run: echo "::set-output name=version::$(echo "${{ steps.get_version.outputs.version }}" | awk -F. -v OFS=. '{++$NF;print $0}')"
+      # - name: Increment Version
+      #   id: increment_version
+      #   run: echo "::set-output name=version::$(echo "${{ steps.get_version.outputs.version }}" | awk -F. -v OFS=. '{++$NF;print $0}')"
 
-      - name: Publish Artifact
+      - name: Check Folder Changes
+        id: folder_changes
+        run: echo "::set-output name=changed::$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }})"
+
+
+      - name: Publish Artifact - Deploy
         uses: actions/upload-artifact@v2
+        if: ${{ contains(steps.folder_changes.outputs.changed, 'deploy/') }}
         with:
-          name: deploy-${{ steps.increment_version.outputs.version }}
+          name: deploy-$VERSION_MAJOR.$VERSION_MINOR.${{ github.run_id }}
           path: deploy
+          retention-days: 300
 
-      - name: Publish Artifact
+      - name: Publish Artifact - Web1
+        id: publish_artifact_web1
         uses: actions/upload-artifact@v2
+        if: ${{ contains(steps.folder_changes.outputs.changed, 'web1/') }}
         with:
-          name: web1-${{ steps.increment_version.outputs.version }}
+          name: web1-$VERSION_MAJOR.$VERSION_MINOR.${{ github.run_id }}
           path: web1
+          retention-days: 300
       
-      - name: Publish Artifact
+      - name: Publish Artifact - Web2
+        id: publish_artifact_web2
         uses: actions/upload-artifact@v2
+        if: ${{ contains(steps.folder_changes.outputs.changed, 'web2/') }}
         with:
-          name: web2-${{ steps.increment_version.outputs.version }}
+          name: web2-$VERSION_MAJOR.$VERSION_MINOR.${{ github.run_id }}
           path: web2
-      
-      - name: Publish Artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: web3-${{ steps.increment_version.outputs.version }}
-          path: web3
+          retention-days: 300
 
+      - name: Publish Artifact
+        id: publish_artifact_web3
+        uses: actions/upload-artifact@v2
+        if: ${{ contains(steps.folder_changes.outputs.changed, 'web3/') }}
+        with:
+          name: web3-$VERSION_MAJOR.$VERSION_MINOR.${{ github.run_id }}
+          path: web3
+          retention-days: 300
+
+      - name: Create Versions Snapshot
+        run: |
+
+          # setup the username and email. I tend to use 'GitHub Actions Bot' with no email by default
+          git --version
+          git config user.name "GitHub Actions Bot"
+          git config user.email "<>"
+          git clone https://github.com/thfai2000/version_snapshots.git
+
+          ./utils/update_latest_snapshot.sh $VERSION_SNAPSHOT_FILENAME deploy deploy-$VERSION_MAJOR.$VERSION_MINOR.${{ github.run_id }} ${{ steps.publish_artifact_deploy.outputs.artifact-url }}
+          ./utils/update_latest_snapshot.sh $VERSION_SNAPSHOT_FILENAME web1 web1-$VERSION_MAJOR.$VERSION_MINOR.${{ github.run_id }} ${{ steps.publish_artifact_web1.outputs.artifact-url }}
+          ./utils/update_latest_snapshot.sh $VERSION_SNAPSHOT_FILENAME web2 web2-$VERSION_MAJOR.$VERSION_MINOR.${{ github.run_id }} ${{ steps.publish_artifact_web2.outputs.artifact-url }}
+          ./utils/update_latest_snapshot.sh $VERSION_SNAPSHOT_FILENAME web3 web3-$VERSION_MAJOR.$VERSION_MINOR.${{ github.run_id }} ${{ steps.publish_artifact_web3.outputs.artifact-url }}
+
+          ./utils/create_snapshot.sh $VERSION_SNAPSHOT_FILENAME ${SNAPSHOT_NAME_PREFIX}
+
+        
       # - name: Trigger Ansible Tower Job
       #   run: |
       #     curl -X POST -H "Content-Type: application/json" \

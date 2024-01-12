@@ -1,5 +1,4 @@
 #!/bin/bash
-
 set -euo pipefail
 
 # VERY IMPORTANT. DON't KEEP HISTORY...environment variable may contain secret
