@@ -120,13 +120,12 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: thfai2000/version_snapshots
-          path: versions
+          ref: main
 
       - name: Create Versions Snapshot
         run: |
 
           # setup the username and email. I tend to use 'GitHub Actions Bot' with no email by default
-          cd versions
           git config user.name github-actions
           git config user.email github-actions@github.com
 
