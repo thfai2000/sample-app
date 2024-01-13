@@ -114,7 +114,8 @@ jobs:
 
       - name: Create Versions Snapshot
         run: |
-
+          ll utils
+          ll ./utils
           ./utils/update_latest_snapshot.sh $VERSION_SNAPSHOT_FILENAME deploy deploy-$VERSION_MAJOR.$VERSION_MINOR.${{ github.run_id }} ${{ github.sha }} ${{ needs.build-deploy.outputs.artifact-url }}
 
           ./utils/update_latest_snapshot.sh $VERSION_SNAPSHOT_FILENAME web1 web1-$VERSION_MAJOR.$VERSION_MINOR.${{ github.run_id }} ${{ github.sha }} ${{ needs.build-web1.outputs.artifact-url }}
