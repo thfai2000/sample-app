@@ -114,8 +114,6 @@ jobs:
 
       - name: Create Versions Snapshot
         run: |
-          chmod +x utils/update_latest_snapshot.sh
-          chmod +x utils/create_snapshot.sh
 
           utils/update_latest_snapshot.sh $VERSION_SNAPSHOT_FILENAME deploy deploy-$VERSION_MAJOR.$VERSION_MINOR.${{ github.run_id }} ${{ github.sha }} ${{ needs.build-deploy.outputs.artifact-url }}
 
