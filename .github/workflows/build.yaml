@@ -36,7 +36,7 @@ jobs:
           # Loop through the files and check if they start with "$component_name"
           for file in $files; do
               if [[ $file == $component_name/* ]]; then
-                  echo "folder_changed=true" >> $GITHUB_OUTPUT"
+                  echo "folder_changed=true" >> $GITHUB_OUTPUT
               fi
           done
 
@@ -70,7 +70,7 @@ jobs:
           # Loop through the files and check if they start with "$component_name"
           for file in $files; do
               if [[ $file == $component_name/* ]]; then
-                  echo "folder_changed=true" >> $GITHUB_OUTPUT"
+                  echo "folder_changed=true" >> $GITHUB_OUTPUT
               fi
           done
 
@@ -104,7 +104,7 @@ jobs:
           # Loop through the files and check if they start with "$component_name"
           for file in $files; do
               if [[ $file == $component_name/* ]]; then
-                  echo "folder_changed=true" >> $GITHUB_OUTPUT"
+                  echo "folder_changed=true" >> $GITHUB_OUTPUT
               fi
           done
 
@@ -138,7 +138,7 @@ jobs:
           # Loop through the files and check if they start with "$component_name"
           for file in $files; do
               if [[ $file == $component_name/* ]]; then
-                  echo "folder_changed=true" >> $GITHUB_OUTPUT"
+                  echo "folder_changed=true" >> $GITHUB_OUTPUT
               fi
           done
 
