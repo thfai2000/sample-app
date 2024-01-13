@@ -124,6 +124,9 @@ jobs:
           ./utils/update_latest_snapshot.sh $VERSION_SNAPSHOT_FILENAME web3 web3-$VERSION_MAJOR.$VERSION_MINOR.${{ github.run_number }} ${{ github.sha }} ${{ needs.build-web3.outputs.artifact-url }}
         
           ./utils/create_snapshot.sh $VERSION_SNAPSHOT_FILENAME ${SNAPSHOT_NAME_PREFIX}
+
+          git config user.email "$VERSION_SNAPSHOT_FILENAME@example.com"
+          git config user.name "$VERSION_SNAPSHOT_FILENAME"
           git add .
           git commit -m "Create/Update Snapshot ${SNAPSHOT_NAME_PREFIX}"
           git push
