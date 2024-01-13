@@ -33,8 +33,8 @@ jobs:
         id: publish_artifact
         uses: actions/upload-artifact@v4
         with:
-          name: $component_name-$VERSION_MAJOR.$VERSION_MINOR.${{ github.run_number }}
-          path: $component_name
+          name: ${{env.component_name}}-${{env.VERSION_MAJOR}}.${{env.VERSION_MINOR}}.${{ github.run_number }}
+          path: ${{env.component_name}}
           retention-days: 300
 
 
@@ -54,8 +54,8 @@ jobs:
         id: publish_artifact
         uses: actions/upload-artifact@v4
         with:
-          name: $component_name-$VERSION_MAJOR.$VERSION_MINOR.${{ github.run_number }}
-          path: $component_name
+          name: ${{env.component_name}}-${{env.VERSION_MAJOR}}.${{env.VERSION_MINOR}}.${{ github.run_number }}
+          path: ${{env.component_name}}
           retention-days: 300
 
 
@@ -75,8 +75,8 @@ jobs:
         id: publish_artifact
         uses: actions/upload-artifact@v4
         with:
-          name: $component_name-$VERSION_MAJOR.$VERSION_MINOR.${{ github.run_number }}
-          path: $component_name
+          name: ${{env.component_name}}-${{env.VERSION_MAJOR}}.${{env.VERSION_MINOR}}.${{ github.run_number }}
+          path: ${{env.component_name}}
           retention-days: 300
 
 
@@ -96,8 +96,8 @@ jobs:
         id: publish_artifact
         uses: actions/upload-artifact@v4
         with:
-          name: $component_name-$VERSION_MAJOR.$VERSION_MINOR.${{ github.run_number }}
-          path: $component_name
+          name: ${{env.component_name}}-${{env.VERSION_MAJOR}}.${{env.VERSION_MINOR}}.${{ github.run_number }}
+          path: ${{env.component_name}}
           retention-days: 300
 
   create-snapshot:
