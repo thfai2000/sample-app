@@ -115,19 +115,14 @@ jobs:
       - name: Create Versions Snapshot
         run: |
 
-          # if ${{ needs.build-deploy.outputs.new_version }}; then
-            ./utils/update_latest_snapshot.sh $VERSION_SNAPSHOT_FILENAME deploy deploy-$VERSION_MAJOR.$VERSION_MINOR.${{ github.run_id }} ${{ github.sha }}) ${{ needs.build-deploy.outputs.artifact-url }}
-          # fi
-          # if ${{ needs.build-web1.outputs.new_version }}; then
-            ./utils/update_latest_snapshot.sh $VERSION_SNAPSHOT_FILENAME web1 web1-$VERSION_MAJOR.$VERSION_MINOR.${{ github.run_id }} ${{ github.sha }}) ${{ needs.build-web1.outputs.artifact-url }}
-          # fi
-          # if ${{ needs.build-web2.outputs.new_version }}; then
-            ./utils/update_latest_snapshot.sh $VERSION_SNAPSHOT_FILENAME web2 web2-$VERSION_MAJOR.$VERSION_MINOR.${{ github.run_id }} ${{ github.sha }}) ${{ needs.build-web2.outputs.artifact-url }}
-          # fi
-          # if ${{ needs.build-web3.outputs.new_version }}; then
-            ./utils/update_latest_snapshot.sh $VERSION_SNAPSHOT_FILENAME web3 web3-$VERSION_MAJOR.$VERSION_MINOR.${{ github.run_id }} ${{ github.sha }}) ${{ needs.build-web3.outputs.artifact-url }}
-          # fi
+          ./utils/update_latest_snapshot.sh $VERSION_SNAPSHOT_FILENAME deploy deploy-$VERSION_MAJOR.$VERSION_MINOR.${{ github.run_id }} ${{ github.sha }} ${{ needs.build-deploy.outputs.artifact-url }}
 
+          ./utils/update_latest_snapshot.sh $VERSION_SNAPSHOT_FILENAME web1 web1-$VERSION_MAJOR.$VERSION_MINOR.${{ github.run_id }} ${{ github.sha }} ${{ needs.build-web1.outputs.artifact-url }}
+
+          ./utils/update_latest_snapshot.sh $VERSION_SNAPSHOT_FILENAME web2 web2-$VERSION_MAJOR.$VERSION_MINOR.${{ github.run_id }} ${{ github.sha }} ${{ needs.build-web2.outputs.artifact-url }}
+
+          ./utils/update_latest_snapshot.sh $VERSION_SNAPSHOT_FILENAME web3 web3-$VERSION_MAJOR.$VERSION_MINOR.${{ github.run_id }} ${{ github.sha }} ${{ needs.build-web3.outputs.artifact-url }}
+        
           ./utils/create_snapshot.sh $VERSION_SNAPSHOT_FILENAME ${SNAPSHOT_NAME_PREFIX}
           git add .
           git commit -m "Create/Update Snapshot ${SNAPSHOT_NAME_PREFIX}"
