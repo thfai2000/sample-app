@@ -135,12 +135,12 @@ jobs:
         run: |
           files=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
           
-          # Loop through the files and check if they start with "$component_name"
-          for file in $files; do
-              if [[ $file == $component_name/* ]]; then
-                  echo "folder_changed=true" >> $GITHUB_OUTPUT
-              fi
-          done
+          # # Loop through the files and check if they start with "$component_name"
+          # for file in $files; do
+          #     if [[ $file == $component_name/* ]]; then
+          #         echo "folder_changed=true" >> $GITHUB_OUTPUT
+          #     fi
+          # done
 
       - name: Publish Artifact
         id: publish_artifact
