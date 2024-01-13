@@ -22,29 +22,16 @@ jobs:
     env:
       component_name: deploy
     outputs:
-      new_version: ${{ steps.folder_changes.outputs.folder_changed }}
+      # new_version: ${{ steps.folder_changes.outputs.folder_changed }}
       artifact-url: ${{ steps.publish_artifact.outputs.artifact-url }}
       
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
         
-      - name: Check Folder Changes
-        id: folder_changes
-        run: |
-          # files=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
-          
-          # # Loop through the files and check if they start with "$component_name"
-          # for file in $files; do
-          #     if [[ $file == $component_name/* ]]; then
-          #         echo "folder_changed=true" >> $GITHUB_OUTPUT
-          #     fi
-          # done
-
       - name: Publish Artifact
         id: publish_artifact
         uses: actions/upload-artifact@v2
-        if: ${{ steps.folder_changes.outputs.folder_changed }}
         with:
           name: $component_name-$VERSION_MAJOR.$VERSION_MINOR.${{ github.run_id }}
           path: $component_name
@@ -56,31 +43,16 @@ jobs:
     env:
       component_name: web1
     outputs:
-      new_version: ${{ steps.folder_changes.outputs.folder_changed }}
+      # new_version: ${{ steps.folder_changes.outputs.folder_changed }}
       artifact-url: ${{ steps.publish_artifact.outputs.artifact-url }}
       
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
         
-      - name: Check Folder Changes
-        id: folder_changes
-        run: |
-          git --version
-          git diff
-          # files=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
-          
-          # # Loop through the files and check if they start with "$component_name"
-          # for file in $files; do
-          #     if [[ $file == $component_name/* ]]; then
-          #         echo "folder_changed=true" >> $GITHUB_OUTPUT
-          #     fi
-          # done
-
       - name: Publish Artifact
         id: publish_artifact
         uses: actions/upload-artifact@v2
-        if: ${{ steps.folder_changes.outputs.folder_changed }}
         with:
           name: $component_name-$VERSION_MAJOR.$VERSION_MINOR.${{ github.run_id }}
           path: $component_name
@@ -92,30 +64,16 @@ jobs:
     env:
       component_name: web2
     outputs:
-      new_version: ${{ steps.folder_changes.outputs.folder_changed }}
+      # new_version: ${{ steps.folder_changes.outputs.folder_changed }}
       artifact-url: ${{ steps.publish_artifact.outputs.artifact-url }}
       
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
         
-      - name: Check Folder Changes
-        id: folder_changes
-        run: |
-          git diff --name-only ${{ github.event.before }} ${{ github.sha }}
-          # files=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
-          
-          # # Loop through the files and check if they start with "$component_name"
-          # for file in $files; do
-          #     if [[ $file == $component_name/* ]]; then
-          #         echo "folder_changed=true" >> $GITHUB_OUTPUT
-          #     fi
-          # done
-
       - name: Publish Artifact
         id: publish_artifact
         uses: actions/upload-artifact@v2
-        if: ${{ steps.folder_changes.outputs.folder_changed }}
         with:
           name: $component_name-$VERSION_MAJOR.$VERSION_MINOR.${{ github.run_id }}
           path: $component_name
@@ -127,29 +85,16 @@ jobs:
     env:
       component_name: web3
     outputs:
-      new_version: ${{ steps.folder_changes.outputs.folder_changed }}
+      # new_version: ${{ steps.folder_changes.outputs.folder_changed }}
       artifact-url: ${{ steps.publish_artifact.outputs.artifact-url }}
       
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
         
-      - name: Check Folder Changes
-        id: folder_changes
-        run: |
-          files=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
-          
-          # Loop through the files and check if they start with "$component_name"
-          for file in $files; do
-              if [[ $file == $component_name/* ]]; then
-                  echo "folder_changed=true" >> $GITHUB_OUTPUT
-              fi
-          done
-
       - name: Publish Artifact
         id: publish_artifact
         uses: actions/upload-artifact@v2
-        if: ${{ steps.folder_changes.outputs.folder_changed }}
         with:
           name: $component_name-$VERSION_MAJOR.$VERSION_MINOR.${{ github.run_id }}
           path: $component_name
@@ -170,18 +115,18 @@ jobs:
       - name: Create Versions Snapshot
         run: |
 
-          if ${{ needs.build-deploy.outputs.new_version }}; then
-            ./utils/update_latest_snapshot.sh $VERSION_SNAPSHOT_FILENAME deploy deploy-$VERSION_MAJOR.$VERSION_MINOR.${{ github.run_id }} ${{ needs.build-deploy.outputs.artifact-url }}
-          fi
-          if ${{ needs.build-web1.outputs.new_version }}; then
-            ./utils/update_latest_snapshot.sh $VERSION_SNAPSHOT_FILENAME web1 web1-$VERSION_MAJOR.$VERSION_MINOR.${{ github.run_id }} ${{ needs.build-web1.outputs.artifact-url }}
-          fi
-          if ${{ needs.build-web2.outputs.new_version }}; then
-            ./utils/update_latest_snapshot.sh $VERSION_SNAPSHOT_FILENAME web2 web2-$VERSION_MAJOR.$VERSION_MINOR.${{ github.run_id }} ${{ needs.build-web2.outputs.artifact-url }}
-          fi
-          if ${{ needs.build-web3.outputs.new_version }}; then
-            ./utils/update_latest_snapshot.sh $VERSION_SNAPSHOT_FILENAME web3 web3-$VERSION_MAJOR.$VERSION_MINOR.${{ github.run_id }} ${{ needs.build-web3.outputs.artifact-url }}
-          fi
+          # if ${{ needs.build-deploy.outputs.new_version }}; then
+            ./utils/update_latest_snapshot.sh $VERSION_SNAPSHOT_FILENAME deploy deploy-$VERSION_MAJOR.$VERSION_MINOR.${{ github.run_id }} ${{ github.sha }}) ${{ needs.build-deploy.outputs.artifact-url }}
+          # fi
+          # if ${{ needs.build-web1.outputs.new_version }}; then
+            ./utils/update_latest_snapshot.sh $VERSION_SNAPSHOT_FILENAME web1 web1-$VERSION_MAJOR.$VERSION_MINOR.${{ github.run_id }} ${{ github.sha }}) ${{ needs.build-web1.outputs.artifact-url }}
+          # fi
+          # if ${{ needs.build-web2.outputs.new_version }}; then
+            ./utils/update_latest_snapshot.sh $VERSION_SNAPSHOT_FILENAME web2 web2-$VERSION_MAJOR.$VERSION_MINOR.${{ github.run_id }} ${{ github.sha }}) ${{ needs.build-web2.outputs.artifact-url }}
+          # fi
+          # if ${{ needs.build-web3.outputs.new_version }}; then
+            ./utils/update_latest_snapshot.sh $VERSION_SNAPSHOT_FILENAME web3 web3-$VERSION_MAJOR.$VERSION_MINOR.${{ github.run_id }} ${{ github.sha }}) ${{ needs.build-web3.outputs.artifact-url }}
+          # fi
 
           ./utils/create_snapshot.sh $VERSION_SNAPSHOT_FILENAME ${SNAPSHOT_NAME_PREFIX}
           git add .
