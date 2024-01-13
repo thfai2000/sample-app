@@ -31,7 +31,7 @@ jobs:
       - name: Check Folder Changes
         id: folder_changes
         run: |
-          files=$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }})
+          files=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
           
           # Loop through the files and check if they start with "$component_name"
           for file in $files; do
@@ -65,7 +65,7 @@ jobs:
       - name: Check Folder Changes
         id: folder_changes
         run: |
-          files=$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }})
+          files=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
           
           # Loop through the files and check if they start with "$component_name"
           for file in $files; do
@@ -99,7 +99,7 @@ jobs:
       - name: Check Folder Changes
         id: folder_changes
         run: |
-          files=$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }})
+          files=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
           
           # Loop through the files and check if they start with "$component_name"
           for file in $files; do
@@ -133,7 +133,7 @@ jobs:
       - name: Check Folder Changes
         id: folder_changes
         run: |
-          echo "$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }})" 
+          files=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
           
           # Loop through the files and check if they start with "$component_name"
           for file in $files; do
