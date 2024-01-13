@@ -22,7 +22,7 @@ jobs:
     env:
       component_name: deploy
     outputs:
-      # new_version: ${{ steps.folder_changes.outputs.folder_changed }}
+      version: ${{env.component_name}}-${{env.VERSION_MAJOR}}.${{env.VERSION_MINOR}}.${{ github.run_number }}
       artifact-url: ${{ steps.publish_artifact.outputs.artifact-url }}
       
     steps:
@@ -43,7 +43,7 @@ jobs:
     env:
       component_name: web1
     outputs:
-      # new_version: ${{ steps.folder_changes.outputs.folder_changed }}
+      version: ${{env.component_name}}-${{env.VERSION_MAJOR}}.${{env.VERSION_MINOR}}.${{ github.run_number }}
       artifact-url: ${{ steps.publish_artifact.outputs.artifact-url }}
       
     steps:
@@ -64,7 +64,7 @@ jobs:
     env:
       component_name: web2
     outputs:
-      # new_version: ${{ steps.folder_changes.outputs.folder_changed }}
+      version: ${{env.component_name}}-${{env.VERSION_MAJOR}}.${{env.VERSION_MINOR}}.${{ github.run_number }}
       artifact-url: ${{ steps.publish_artifact.outputs.artifact-url }}
       
     steps:
@@ -85,7 +85,7 @@ jobs:
     env:
       component_name: web3
     outputs:
-      # new_version: ${{ steps.folder_changes.outputs.folder_changed }}
+      version: ${{env.component_name}}-${{env.VERSION_MAJOR}}.${{env.VERSION_MINOR}}.${{ github.run_number }}
       artifact-url: ${{ steps.publish_artifact.outputs.artifact-url }}
       
     steps:
@@ -115,20 +115,20 @@ jobs:
       - name: Create Versions Snapshot
         run: |
 
-          ./utils/update_latest_snapshot.sh $VERSION_SNAPSHOT_FILENAME deploy deploy-$VERSION_MAJOR.$VERSION_MINOR.${{ github.run_number }} ${{ github.sha }} ${{ needs.build-deploy.outputs.artifact-url }}
+          ./utils/update_latest_snapshot.sh ${{ env.VERSION_SNAPSHOT_FILENAME }} deploy ${{ needs.build-deploy.outputs.version }} ${{ github.sha }} ${{ needs.build-deploy.outputs.artifact-url }}
 
-          ./utils/update_latest_snapshot.sh $VERSION_SNAPSHOT_FILENAME web1 web1-$VERSION_MAJOR.$VERSION_MINOR.${{ github.run_number }} ${{ github.sha }} ${{ needs.build-web1.outputs.artifact-url }}
+          ./utils/update_latest_snapshot.sh ${{ env.VERSION_SNAPSHOT_FILENAME }} web1 ${{ needs.build-web1.outputs.version }} ${{ github.sha }} ${{ needs.build-web1.outputs.artifact-url }}
 
-          ./utils/update_latest_snapshot.sh $VERSION_SNAPSHOT_FILENAME web2 web2-$VERSION_MAJOR.$VERSION_MINOR.${{ github.run_number }} ${{ github.sha }} ${{ needs.build-web2.outputs.artifact-url }}
+          ./utils/update_latest_snapshot.sh ${{ env.VERSION_SNAPSHOT_FILENAME }} web2 ${{ needs.build-web2.outputs.version }} ${{ github.sha }} ${{ needs.build-web2.outputs.artifact-url }}
 
-          ./utils/update_latest_snapshot.sh $VERSION_SNAPSHOT_FILENAME web3 web3-$VERSION_MAJOR.$VERSION_MINOR.${{ github.run_number }} ${{ github.sha }} ${{ needs.build-web3.outputs.artifact-url }}
+          ./utils/update_latest_snapshot.sh ${{ env.VERSION_SNAPSHOT_FILENAME }} web3 ${{ needs.build-web3.outputs.version }} ${{ github.sha }} ${{ needs.build-web3.outputs.artifact-url }}
         
-          ./utils/create_snapshot.sh $VERSION_SNAPSHOT_FILENAME ${SNAPSHOT_NAME_PREFIX}
+          ./utils/create_snapshot.sh ${{ env.VERSION_SNAPSHOT_FILENAME }} ${{ env.SNAPSHOT_NAME_PREFIX }}
 
-          git config user.email "$VERSION_SNAPSHOT_FILENAME@example.com"
-          git config user.name "$VERSION_SNAPSHOT_FILENAME"
+          git config user.email "${{ env.VERSION_SNAPSHOT_FILENAME }}@example.com"
+          git config user.name "${{ env.VERSION_SNAPSHOT_FILENAME }}"
           git add .
-          git commit -m "Create/Update Snapshot ${SNAPSHOT_NAME_PREFIX}"
+          git commit -m "Create/Update Snapshot ${{ env.SNAPSHOT_NAME_PREFIX }}"
           git push
         
       # - name: Trigger Ansible Tower Job
