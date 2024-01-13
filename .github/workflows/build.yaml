@@ -114,15 +114,16 @@ jobs:
 
       - name: Create Versions Snapshot
         run: |
-          ls -l utils
-          ls -l ./utils
-          ./utils/update_latest_snapshot.sh $VERSION_SNAPSHOT_FILENAME deploy deploy-$VERSION_MAJOR.$VERSION_MINOR.${{ github.run_id }} ${{ github.sha }} ${{ needs.build-deploy.outputs.artifact-url }}
+          chmod +x utils/update_latest_snapshot.sh
+          chmod +x utils/create_snapshot.sh
 
-          ./utils/update_latest_snapshot.sh $VERSION_SNAPSHOT_FILENAME web1 web1-$VERSION_MAJOR.$VERSION_MINOR.${{ github.run_id }} ${{ github.sha }} ${{ needs.build-web1.outputs.artifact-url }}
+          utils/update_latest_snapshot.sh $VERSION_SNAPSHOT_FILENAME deploy deploy-$VERSION_MAJOR.$VERSION_MINOR.${{ github.run_id }} ${{ github.sha }} ${{ needs.build-deploy.outputs.artifact-url }}
 
-          ./utils/update_latest_snapshot.sh $VERSION_SNAPSHOT_FILENAME web2 web2-$VERSION_MAJOR.$VERSION_MINOR.${{ github.run_id }} ${{ github.sha }} ${{ needs.build-web2.outputs.artifact-url }}
+          utils/update_latest_snapshot.sh $VERSION_SNAPSHOT_FILENAME web1 web1-$VERSION_MAJOR.$VERSION_MINOR.${{ github.run_id }} ${{ github.sha }} ${{ needs.build-web1.outputs.artifact-url }}
 
-          ./utils/update_latest_snapshot.sh $VERSION_SNAPSHOT_FILENAME web3 web3-$VERSION_MAJOR.$VERSION_MINOR.${{ github.run_id }} ${{ github.sha }} ${{ needs.build-web3.outputs.artifact-url }}
+          utils/update_latest_snapshot.sh $VERSION_SNAPSHOT_FILENAME web2 web2-$VERSION_MAJOR.$VERSION_MINOR.${{ github.run_id }} ${{ github.sha }} ${{ needs.build-web2.outputs.artifact-url }}
+
+          utils/update_latest_snapshot.sh $VERSION_SNAPSHOT_FILENAME web3 web3-$VERSION_MAJOR.$VERSION_MINOR.${{ github.run_id }} ${{ github.sha }} ${{ needs.build-web3.outputs.artifact-url }}
         
           ./utils/create_snapshot.sh $VERSION_SNAPSHOT_FILENAME ${SNAPSHOT_NAME_PREFIX}
           git add .
