@@ -31,7 +31,7 @@ jobs:
         
       - name: Publish Artifact
         id: publish_artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: $component_name-$VERSION_MAJOR.$VERSION_MINOR.${{ github.run_number }}
           path: $component_name
@@ -52,7 +52,7 @@ jobs:
         
       - name: Publish Artifact
         id: publish_artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: $component_name-$VERSION_MAJOR.$VERSION_MINOR.${{ github.run_number }}
           path: $component_name
@@ -73,7 +73,7 @@ jobs:
         
       - name: Publish Artifact
         id: publish_artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: $component_name-$VERSION_MAJOR.$VERSION_MINOR.${{ github.run_number }}
           path: $component_name
@@ -94,7 +94,7 @@ jobs:
         
       - name: Publish Artifact
         id: publish_artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: $component_name-$VERSION_MAJOR.$VERSION_MINOR.${{ github.run_number }}
           path: $component_name
