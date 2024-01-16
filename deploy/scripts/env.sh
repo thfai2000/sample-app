@@ -1,0 +1,23 @@
+{{- with datasource "values" -}}
+WHICH_ENV={{ .which_env }}
+WHICH_SITE={{ .which_site }}
+APPLICATION_NAME={{ .application_name }}
+HOSTNAME={{ .hostname }}
+HOME_DIR={{ .home_dir }}
+APP_SERVICE_ACCOUNT={{ .app_service_account }}
+APP_SERVICE_ACCOUNT_GROUP={{ .app_service_account_group }}
+KERBEROS_KEYTAB_PATH={{ .kerberos_keytab_path }}
+KERBEROS_TKT_PATH={{ .kerberos_tkt_path }}
+COMPONENT_NAME={{ .component_name }}
+COMPONENT_VERSION={{ .component_version }}
+PRINT_ALL_RENDERED_TEMPLATES_FLAG={{ .print_all_rendered_templates_flag }}
+PRINT_BASH_COMMANDS_FLAG={{ .print_bash_command_flag }}
+DOWNLOAD_DEPLOY_DIR={{ .download_deploy_dir }}
+DOWNLOAD_COMPONENT_BINARY_DIR={{ .download_component_binary_dir }}
+DEPLOY_DIR={{ .deploy_dir }}
+COMPONENT_BINARY_DIR={{ .component_binary_dir }}
+COMPONENT_SCRIPTS_DIR={{ .component_scripts_dir }}
+COMPONENT_TEMPLATES_DIR={{ .component_template_dir }}
+COMPONENT_LOCAL_DATA_DIR={{ .component_local_data_dir }}
+APP_LOG_DIR={{ .app_log_dir }}
+{{- end -}}

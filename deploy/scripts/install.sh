@@ -131,25 +131,25 @@ if [ ! -f "$DEPLOY_DIR/scripts/render-template.sh" ] || [ ! -f "$DEPLOY_DIR/scri
 fi
 
 # Check the existence of specific scripts and files
-if [ ! -f "$UNZIPPED_COMPONENT_BINARY_DIR/templates/scripts/start.sh" ] && [ ! -f "$UNZIPPED_COMPONENT_BINARY_DIR/scripts/start.sh" ]; then
+if [ ! -f "$UNZIPPED_COMPONENT_BINARY_DIR/scripts/start.sh" ] && [ ! -f "$UNZIPPED_COMPONENT_BINARY_DIR/scripts/start.sh" ]; then
     echo "ERROR: start.sh is missing."
     exit 1
 fi
 
 # Check the existence of specific scripts and files
-if [ ! -f "$UNZIPPED_COMPONENT_BINARY_DIR/templates/scripts/stop.sh" ] && [ ! -f "$UNZIPPED_COMPONENT_BINARY_DIR/scripts/stop.sh" ]; then
+if [ ! -f "$UNZIPPED_COMPONENT_BINARY_DIR/scripts/stop.sh" ] && [ ! -f "$UNZIPPED_COMPONENT_BINARY_DIR/scripts/stop.sh" ]; then
     echo "ERROR: stop.sh is missing."
     exit 1
 fi
 
 # Check the existence of specific scripts and files
-if [ ! -f "$UNZIPPED_COMPONENT_BINARY_DIR/templates/scripts/liveness-check.sh" ] && [ ! -f "$UNZIPPED_COMPONENT_BINARY_DIR/scripts/liveness-check.sh" ]; then
+if [ ! -f "$UNZIPPED_COMPONENT_BINARY_DIR/scripts/liveness-check.sh" ] && [ ! -f "$UNZIPPED_COMPONENT_BINARY_DIR/scripts/liveness-check.sh" ]; then
     echo "ERROR: liveness-check.sh is missing."
     exit 1
 fi
 
 # Check the existence of specific scripts and files
-if [ ! -f "$UNZIPPED_COMPONENT_BINARY_DIR/templates/scripts/readiness-check.sh" ] && [ ! -f "$UNZIPPED_COMPONENT_BINARY_DIR/scripts/readiness-check.sh" ]; then
+if [ ! -f "$UNZIPPED_COMPONENT_BINARY_DIR/scripts/readiness-check.sh" ] && [ ! -f "$UNZIPPED_COMPONENT_BINARY_DIR/scripts/readiness-check.sh" ]; then
     echo "ERROR: readiness-check.sh is missing."
     exit 1
 fi
@@ -192,7 +192,7 @@ echo "Dry run of template rendering"
 
 mkdir -p /tmp/gomplate/$WHICH_ENV/
 rm -rf /tmp/gomplate/$WHICH_ENV/*
-$DEPLOY_DIR/scripts/render-template.sh $DEPLOY_DIR/values/$WHICH_ENV.yaml $UNZIPPED_COMPONENT_BINARY_DIR/templates /tmp/gomplate/$WHICH_ENV/
+$DEPLOY_DIR/scripts/render-template.sh $DEPLOY_DIR/values/$WHICH_ENV.yaml $UNZIPPED_COMPONENT_BINARY_DIR /tmp/gomplate/$WHICH_ENV/
 
 
 if [ "$PRINT_ALL_RENDERED_TEMPLATES_FLAG" -eq "1" ]; then
@@ -237,15 +237,11 @@ else
     echo "# Not found before-install.sh. Skipped."
 fi
 
-echo "# Copy files from download directory to component directory"
-cp -r $UNZIPPED_COMPONENT_BINARY_DIR/* $COMPONENT_BINARY_DIR/.
-
-
 echo "# Real run of template rendering"
 # Real run of template rendering
 $DEPLOY_DIR/scripts/render-template.sh \
     $DEPLOY_DIR/values/$WHICH_ENV.yaml \
-    $COMPONENT_TEMPLATES_DIR \
+    $UNZIPPED_COMPONENT_BINARY_DIR \
     $COMPONENT_BINARY_DIR/
 
 echo "# Change file ownership and permissions"
