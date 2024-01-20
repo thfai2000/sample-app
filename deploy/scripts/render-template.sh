@@ -13,5 +13,6 @@ chmod 755 $(dirname "$0")/gomplate
 $(dirname "$0")/gomplate \
 --input-dir=$TEMPLATE_DIR \
 --output-dir=$OUTPUT_DIR \
---datasource values=$VALUE_FILE
-
+--datasource values=$VALUE_FILE \
+--left-delim "{{" \
+--right-delim "}}"
