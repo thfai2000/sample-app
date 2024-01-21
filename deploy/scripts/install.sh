@@ -20,7 +20,6 @@ env_vars=(
 "PRINT_BASH_COMMANDS_FLAG"
 "DOWNLOAD_DEPLOY_DIR"
 "DOWNLOAD_COMPONENT_BINARY_DIR"
-"DEPLOY_DIR"
 "COMPONENT_BINARY_DIR"
 "COMPONENT_SCRIPTS_DIR"
 "COMPONENT_LOCAL_DATA_DIR"
@@ -70,34 +69,6 @@ do
     fi
 done
 
-echo "Unzip files for checking"
-UNZIPPED_COMPONENT_BINARY_DIR=$DOWNLOAD_COMPONENT_BINARY_DIR/unzipped 
-mkdir -p $UNZIPPED_COMPONENT_BINARY_DIR
-
-zip_files=$(find $DOWNLOAD_COMPONENT_BINARY_DIR -name "*.zip")
-if [ -n "$zip_files" ]; then
-  echo "Unzipping files..."
-  find $DOWNLOAD_COMPONENT_BINARY_DIR -name "*.zip" -exec unzip {} -d $UNZIPPED_COMPONENT_BINARY_DIR/ \;
-else
-  echo "No zip files found."
-fi
-
-tar_files=$(find $DOWNLOAD_COMPONENT_BINARY_DIR -name "*.tar")
-if [ -n "$tar_files" ]; then
-  echo "Untarring files..."
-  tar -zxvf $DOWNLOAD_COMPONENT_BINARY_DIR/*.tar -C $UNZIPPED_COMPONENT_BINARY_DIR/
-else
-  echo "No tar files found."
-fi
-
-gz_files=$(find $DOWNLOAD_COMPONENT_BINARY_DIR -name "*.tar.gz")
-if [ -n "$gz_files" ]; then
-  echo "Untarring gzipped files..."
-  tar -zxvf $DOWNLOAD_COMPONENT_BINARY_DIR/*.tar.gz -C $UNZIPPED_COMPONENT_BINARY_DIR/
-else
-  echo "No gzipped tar files found."
-fi
-
 
 # Check the existence of service accounts
 if [ ! "$(id -u $APP_SERVICE_ACCOUNT 2>/dev/null)" ]; then
@@ -117,7 +88,7 @@ chown -R $APP_SERVICE_ACCOUNT:$APP_SERVICE_ACCOUNT_GROUP $UNZIPPED_COMPONENT_BIN
 chmod -R 754 $UNZIPPED_COMPONENT_BINARY_DIR
 
 # Check the existence of specific scripts and files
-if [ ! -f "$DEPLOY_DIR/scripts/render-template.sh" ] || [ ! -f "$DEPLOY_DIR/scripts/app-services-status.sh" ]; then
+if [ ! -f "$DOWNLOAD_DEPLOY_DIR/scripts/render-template.sh" ] || [ ! -f "$DOWNLOAD_DEPLOY_DIR/scripts/app-services-status.sh" ]; then
     echo "ERROR: One or more required scripts or files are missing."
     exit 1
 fi
@@ -165,7 +136,7 @@ fi
 
 echo "# Real run of template rendering"
 # Real run of template rendering
-$DEPLOY_DIR/scripts/render-template.sh \
+$DOWNLOAD_DEPLOY_DIR/scripts/render-template.sh \
     $VALUE_FILE_PATH \
     $UNZIPPED_COMPONENT_BINARY_DIR \
     $COMPONENT_BINARY_DIR/
