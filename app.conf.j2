@@ -1,0 +1,8 @@
+server {
+    listen {{ component_properties.web.nginx_listen_port }};
+
+    location / {
+        root   /www;
+        index  app.html;
+    }
+}

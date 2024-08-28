@@ -1,0 +1,10 @@
+# {{- $site := getenv "WHICH_SITE" -}}
+# {{- with (index (datasource "values") $site) -}}
+#######################################################
+# Common properties
+#######################################################
+project:
+  name: 'web1'
+  version: '{{ getenv "COMPONENT_VERSION" }}'
+  snapshotVersion: '{{ getenv "SNAPSHOT_VERSION" }}'
+#{{- end -}}
